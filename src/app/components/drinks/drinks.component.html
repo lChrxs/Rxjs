@@ -1,0 +1,9 @@
+<div *ngIf="bebidas">
+  <div *ngFor="let bebida of bebidas; let i = index">
+    <label>{{bebida.name}}</label>
+    <img [src]="bebida.img" alt="" style="height: 150px; width: 150px;">
+    <ul>
+      <li *ngFor="let item of bebida.ingredients">{{item}}</li>
+    </ul>
+  </div>
+</div>

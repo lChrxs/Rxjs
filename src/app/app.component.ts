@@ -7,4 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'clase5-a';
+  bActivo: boolean = true;
+
+  ocultar(){
+    this.bActivo = !this.bActivo
+  }
 }

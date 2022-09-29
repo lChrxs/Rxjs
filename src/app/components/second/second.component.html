@@ -1,0 +1,17 @@
+<p>second works!</p>
+<!-- <div *ngIf="shareS.data$ | async as info">
+  {{info | json}}
+</div> -->
+<form *ngIf="shareS.data$ | async as info">
+
+  <div>
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" placeholder="Nombre" [value]="info.name">
+  </div>
+  
+  <div>
+    <label for="password" >Password</label>
+    <input type="password" name="password" id="password"  [value]="info.password">
+  </div>
+
+</form>
