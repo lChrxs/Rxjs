@@ -29,8 +29,18 @@ export class RequestService {
  */
   getPokemon(): Observable<any>{ //*Peticion principal
     return this.http.get('https://pokeapi.co/api/v2/pokemon/pikachu').pipe( //*Hace la primer peticion a pokemon/pikachu
-      concatMap((resPokemon: any) => { //*Concatena la peticion de getSpecies con la peticion pokemon/pikachu
-        return this.getSpecies(resPokemon.species.url, resPokemon) //Le pasamos la url del endPoint de Species y la respuesta de la peticion a pokemon/pikachu
+      map((resPokemon: any) => {
+        let newResPokemon = {
+          name: resPokemon.name,
+          stats: resPokemon.stats,
+          species: resPokemon.species
+        }
+        console.log('New response', newResPokemon);
+        
+        return newResPokemon
+      }),
+      concatMap((newResPokemon: any) => { //*Concatena la peticion de getSpecies con la peticion pokemon/pikachu
+        return this.getSpecies(newResPokemon.species.url, newResPokemon) //Le pasamos la url del endPoint de Species y la respuesta de la peticion a pokemon/pikachu
       }),
       concatMap((resSpecies: any) => { //*Concatena la peticion de getVarieties con la de getSpecies y pokemon/pikachu
         return this.getVarieties(resSpecies);
@@ -52,14 +62,17 @@ export class RequestService {
   getSpecies(url: string, original: any): Observable<any>{
     return this.http.get(url).pipe(
       map((resSpecies: any) => {
+
+        let newResSpecies: any[] = resSpecies.varieties
         
-        (resSpecies.varieties as any[]).forEach(el => { //resSpecies.varieties es un arreglo de las variedad del pokemon con su url al endpoint de cada una
+        newResSpecies.forEach(el => { //resSpecies.varieties es un arreglo de las variedades del pokemon con su url al endpoint de cada una
           this.toSearch.push(this.http.get(el.pokemon.url)) //Obtenemos cada url de las variedad y la juntamos a su peticion http para guardar las peticiones en toSearch
         }) 
         console.log(this.toSearch)
+        delete original['species']
 
-        return {
-          ...resSpecies, ...original //Regresamos la respuesta de resSpecies y la respuesta de pokemon/pikachu
+        return { //Solo regresamos la respuesta original ya que de species solo nos interesa obtner las urls a los endpoints de las variedades
+          ...original //Regresamos la respuesta de resSpecies y la respuesta de pokemon/pikachu
         }
       })
     )
@@ -88,7 +101,7 @@ export class RequestService {
           }
         })
 
-        return { //Regresamos original que son las 2 peticiones combinadas mas la nueva key que reemplzada la key sprites por la que hicimos
+        return { //Regresamos original que son las 2 peticiones combinadas mas la nueva key que reemplaza la key sprites por la que hicimos
           ...original, 
           sprites: sprites
         }
